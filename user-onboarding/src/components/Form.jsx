@@ -2,40 +2,43 @@ import styled from "styled-components";
 import React, { useState } from "react";
 import * as Yup from "yup";
 
-export default function Form({ user, change, submit, disabled }) {
-  const StyledContainer = styled.div`
+const StyledContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  margin: 20px 30px;
+  border-bottom: 1px solid black;
+  justify-content: center;
+  align-items: center;
+  padding: 30px;
+  flex: 1;
+
+  button {
     display: flex;
-    flex-direction: column;
-    margin: 20px 30px;
-    border-bottom: 1px solid black;
-    justify-content: center;
-    align-items: center;
-    padding: 30px;
-    flex: 1;
-
-    button {
-      display: flex;
-      margin: auto;
-    }
-  `;
-
-  const SignUpHeading = styled.h1`
-    color: royalblue;
-    display: flex;
-    justify-content: center;
-    align-content: center;
     margin: auto;
-  `;
+  }
 
-  const TermsContainer = styled.label`
-    display: inline-block;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    margin: auto;
+  .errors {
     color: red;
-    text-decoration: underline;
-  `;
+    font-style: italic;
+  }
+`;
+
+const SignUpHeading = styled.h1`
+  color: royalblue;
+  display: flex;
+  justify-content: center;
+  align-content: center;
+  margin: auto;
+`;
+
+const TermsContainer = styled.label`
+  display: flex;
+  justify-content: center;
+  color: red;
+  text-decoration: underline;
+`;
+
+export default function Form({ user, change, submit, disabled, errors }) {
   return (
     <>
       <SignUpHeading className="sign-up">SIGN-UP</SignUpHeading>
@@ -45,7 +48,7 @@ export default function Form({ user, change, submit, disabled }) {
         <br />
         <form onSubmit={submit}>
           <label htmlFor="fNameInput">
-            First Name:
+            First Name: &nbsp;
             <input
               id="fNameInput"
               type="text"
@@ -57,7 +60,7 @@ export default function Form({ user, change, submit, disabled }) {
           </label>
 
           <label htmlFor="lNameInput">
-            &nbsp; Last Name:
+            &nbsp; Last Name: &nbsp;
             <input
               id="lNameInput"
               type="text"
@@ -68,8 +71,13 @@ export default function Form({ user, change, submit, disabled }) {
             />
           </label>
           <br />
+          <div className="errors">
+            {errors.fName}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            {errors.lName}
+          </div>
+          <br />
           <label htmlFor="emailInput">
-            Email:
+            Email: &nbsp;
             <input
               id="emailInput"
               type="text"
@@ -79,9 +87,22 @@ export default function Form({ user, change, submit, disabled }) {
               value={user.email}
             />
           </label>
+          <label>
+            &nbsp;Role: &nbsp;
+            <select id="role" value={user.role} onChange={change} name="role">
+              <option value={""}>--Please choose and option--</option>
+              <option value={"Front-End Developer"}>Front-End Developer</option>
+              <option value={"Back-End Developer"}>Back-End Developer</option>
+              <option value={"Full-Stack Developer"}>
+                Full-Stack Developer
+              </option>
+            </select>
+          </label>
+          <br />
+          <div className="errors">{errors.email}</div>
           <br />
           <label htmlFor="passwordInput">
-            Password:
+            Password: &nbsp;
             <input
               id="passwordInput"
               type="text"
@@ -92,7 +113,7 @@ export default function Form({ user, change, submit, disabled }) {
             />
           </label>
           <label htmlFor="confirmPasswordInput">
-            &nbsp; Confirm Password:
+            &nbsp; Confirm Password: &nbsp;
             <input
               id="confirmPasswordInput"
               type="text"
@@ -102,6 +123,11 @@ export default function Form({ user, change, submit, disabled }) {
               value={user.confirmPassword}
             />
           </label>
+          <br />
+          <div className="errors">
+            {errors.password}
+            {errors.confirmPassword}
+          </div>
           <br />
           <TermsContainer id="termsInput" className="terms-container">
             <span className="terms">Accept Terms & Conditions</span>

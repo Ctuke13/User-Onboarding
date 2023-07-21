@@ -12,6 +12,7 @@ function App() {
     fName: "",
     lName: "",
     email: "",
+    role: "",
     password: "",
     terms: false,
     confirmPassword: "",
@@ -21,7 +22,9 @@ function App() {
     fName: "",
     lName: "",
     email: "",
+    role: "",
     password: "",
+    confirmPassword: "",
     terms: false,
   });
   const [disabled, setButtonDisabled] = useState(true);
@@ -31,7 +34,11 @@ function App() {
     lName: Yup.string().required("Please enter last name."),
     email: Yup.string()
       .email("Please enter valid email address.")
-      .required("Please enter email address"),
+      .required("Please enter email address")
+      .test("checkDup", "Email already exists!", (value) =>
+        checkDupEmail(value)
+      ),
+    role: Yup.string().required("Please select your role."),
     password: Yup.string()
       .required("Please enter password")
       .min(6, "Password must be atleast 6 characters long."),
@@ -41,8 +48,12 @@ function App() {
     terms: Yup.boolean().oneOf([true]),
   });
 
+  const checkDupEmail = (email) => {
+    const emailExist = users.find((user) => user.email === email);
+    return !emailExist;
+  };
+
   const inputChange = (e) => {
-    console.log(e);
     const { name, value, type, checked } = e.target;
     const infoUpdated = type === "checkbox" ? checked : value;
 
@@ -50,23 +61,19 @@ function App() {
       Yup.reach(schema, name)
         .validate(checked)
         .then((valid) => {
-          setErrors({
-            ...errors,
-            [name]: "",
+          setErrors((prevErrors) => {
+            return { ...prevErrors, [name]: "" };
           });
         })
         .catch((err) => {
-          setErrors({
-            ...errors,
-            [name]: err.errors[0],
-          });
-        })
-        .finally(() => {
-          setNewUser({
-            ...newUser,
-            [name]: infoUpdated,
+          setErrors((prevErrors) => {
+            return { ...prevErrors, [name]: err.errors[0] };
           });
         });
+      setNewUser({
+        ...newUser,
+        [name]: infoUpdated,
+      });
     } else {
       Yup.reach(schema, name)
         .validate(value)
@@ -81,35 +88,43 @@ function App() {
             ...errors,
             [name]: err.errors[0],
           });
-        })
-        .finally(() => {
-          setNewUser({
-            ...newUser,
-            [name]: infoUpdated,
-          });
         });
+      setNewUser({
+        ...newUser,
+        [name]: infoUpdated,
+      });
     }
   };
 
-  // useEffect(() => {
-  //   console.log(useEffect);
-  //   schema.isValid(newUser).then((valid) => {
-  //     setButtonDisabled(!valid);
-  //   });
-  // }, [newUser]);
+  useEffect(() => {
+    schema.isValid(newUser).then((valid) => {
+      setButtonDisabled(!valid);
+    });
+  }, [newUser]);
 
   const formSubmit = (e) => {
     e.preventDefault();
+
     console.log("submitted");
     axios
       .post("https://reqres.in/api/users", newUser)
       .then((res) => {
+        console.log(res.data);
         setPost(res.data);
-        console.log(res);
+        setUsers((prevUsers) => [...prevUsers, res.data]);
       })
       .catch((err) => {
         console.error(err);
       });
+    setNewUser({
+      fName: "",
+      lName: "",
+      email: "",
+      role: "",
+      password: "",
+      confirmPassword: "",
+      terms: false,
+    });
   };
 
   return (
@@ -119,8 +134,9 @@ function App() {
         change={inputChange}
         submit={formSubmit}
         disabled={disabled}
+        errors={errors}
       />
-      <Users />
+      <Users users={users} />
     </div>
   );
 }
