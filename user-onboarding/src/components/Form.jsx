@@ -139,7 +139,9 @@ export default function Form({ user, change, submit, disabled, errors }) {
             />
           </TermsContainer>
           <br />
-          <button disabled={disabled}>Submit</button>
+          <button data-cy={"submit"} disabled={disabled}>
+            Submit
+          </button>
         </form>
       </StyledContainer>
     </>

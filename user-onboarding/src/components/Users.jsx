@@ -10,7 +10,7 @@ export default function Users({ users }) {
       {users.map((user, idx) => {
         return (
           <UserDiv key={idx + 1}>
-            <div style={{ fontStyle: "bold" }}>
+            <div data-cy={'info'} style={{ fontStyle: "bold" }}>
               {user.fName}&nbsp;{user.lName}
             </div>
             <br />
